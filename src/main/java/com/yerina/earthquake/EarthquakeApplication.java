@@ -9,4 +9,5 @@ public class EarthquakeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EarthquakeApplication.class, args);
 	}
+
 }
