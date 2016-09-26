@@ -28,7 +28,7 @@ public class EarthquakeController {
 
         Keyboard keyboardResponse = new Keyboard();
         keyboardResponse.setType("buttons");
-        keyboardResponse.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령"));
+        keyboardResponse.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령","3. 대피소 찾기"));
         logger.debug("[keyboardResponse][{}]",keyboardResponse);
 
         return keyboardResponse;
@@ -44,7 +44,7 @@ public class EarthquakeController {
 
         Keyboard keyboard = new Keyboard();
         keyboard.setType("buttons");
-        keyboard.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령"));
+        keyboard.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령", "3. 대피소 찾기"));
 
         if(requestMessage.getContent().startsWith("1")){
             final List<Earthquake> infoEarthquake1 = earthquakeService.getInfoEarthquake();
@@ -97,7 +97,18 @@ public class EarthquakeController {
             message.setMessage_button(messageButton);
             responseMessage.setKeyboard(keyboard);
             responseMessage.setMessage(message);
+        }else if(requestMessage.getContent().startsWith("3")){
+            StringBuffer nearShelterSearch = new StringBuffer();
+            nearShelterSearch.append("아래 링크로 들어가 본인 주변의 대피소 확인\n\n");
+            message.setText(String.valueOf(nearShelterSearch));
+            MessageButton messageButton = new MessageButton("대피소 찾기", "http://safekorea.go.kr/idsiSFK/57/menuMap.do?w2xPath=/idsiSFK/wq/sfk/cs/contents/civil_defense/SDIJKM1402.xml");
+            message.setMessage_button(messageButton);
+            responseMessage.setKeyboard(keyboard);
+            responseMessage.setMessage(message);
+
         }
+
+
         return responseMessage;
     }
 
