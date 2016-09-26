@@ -2,14 +2,13 @@ package com.yerina.earthquake.controller;
 
 import com.yerina.earthquake.domain.*;
 import com.yerina.earthquake.service.inf.EarthquakeService;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by philip on 2016-09-22.
@@ -25,7 +24,7 @@ public class EarthquakeController {
     private EarthquakeService earthquakeService;
 
     @RequestMapping(value = "/keyboard", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
-    public Keyboard homeKeyboardAPI(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public Keyboard homeKeyboardAPI() {
 
         Keyboard keyboardResponse = new Keyboard();
         keyboardResponse.setType("buttons");
@@ -48,48 +47,57 @@ public class EarthquakeController {
         keyboard.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령"));
 
         if(requestMessage.getContent().startsWith("1")){
-            final Earthquake infoEarthquake = earthquakeService.getInfoEarthquake();
-            message.setText("강도 : "+infoEarthquake.getEarthQuakeSacle()+ "\n" +
-                            "발생 시간 : " +infoEarthquake.getEarthQuakeTime() +"\n" +
-                            "위치 :" + infoEarthquake.getEarthQuakeArea() +"\n"
-            );
+            final List<Earthquake> infoEarthquake1 = earthquakeService.getInfoEarthquake();
+
+            StringBuffer earthquakeInfo = new StringBuffer();
+            earthquakeInfo.append("최근 발생 지진 현황 정보\n\n");
+
+            for (Earthquake earthquake : infoEarthquake1) {
+                earthquakeInfo.append("-----------------\n");
+                earthquakeInfo.append("강도 : "+earthquake.getEarthQuakeSacle()+"\n");
+                earthquakeInfo.append("시간 : "+earthquake.getEarthQuakeTime()+"\n");
+                earthquakeInfo.append("위치 : "+earthquake.getEarthQuakeArea()+"\n");
+            }
+            
+            message.setText(String.valueOf(earthquakeInfo));
+
             MessageButton messageButton = new MessageButton("국가지진종합정보센터", "http://necis.kma.go.kr/necis-dbf/usermain/new/common/userMainNewForm.do");
             message.setMessage_button(messageButton);
             responseMessage.setKeyboard(keyboard);
             responseMessage.setMessage(message);
 
         }else if(requestMessage.getContent().startsWith("2")){
-            message.setText(
-                    "지진 대피 요령\n\n" +
-                    "1. 집안에 있을 경우\n"+
-                    "  - 테이블 밑으로 들어가 몸을 보호\n" +
-                    "  - 가스밸브 및 전스 OFF\n" +
-                    "  - 진동이 멈춘후 밖으로 대피 한다.\n\n" +
-                    "2. 집 밖에 있을 경우\n"+
-                    "  - 낙하물 주의 및 머리 보호\n\n" +
-                    "3. 상가에 있을 경우\n"+
-                    "  - 침착하게 행동\n\n" +
-                    "4. 엘리베이터를 타고 있을 경우\n"+
-                    "  - 가장 가까운 층에 내려 대피\n\n" +
-                    "5. 전철을 타고 있는 경우\n"+
-                    "  - 고정물을 꽉 잡자\n\n" +
-                    "6. 운전을 하고 있는 경우\n"+
-                    "  - 도로 우측에 정차한 후 대피\n\n" +
-                    "7. 산이나 바다에 있을 경우\n"+
-                    "  - 산사태 등 위험 지역 신속 대피\n\n" +
-                    "8. 부상자가 있는 경우\n"+
-                    "  - 서로 협력해서 응급 구호\n\n" +
-                    "9. 피난은 마지막 수단\n"+
-                    "  - 짐은 최소한으로 하고 대피는 걸어서\n\n" +
-                    "10. 올바른 정보에 따라 행동\n"+
-                    "  - 유언비어를 믿지 말자\n"
-            );
+            StringBuffer takeShelterString = new StringBuffer();
+            takeShelterString.append("지진 대피 요령\n\n");
+            takeShelterString.append("1. 집안에 있을 경우\n");
+            takeShelterString.append("  - 테이블 밑으로 들어가 몸을 보호\n");
+            takeShelterString.append("  - 가스밸브 및 전스 OFF\n");
+            takeShelterString.append("  - 진동이 멈춘후 밖으로 대피 한다.\n\n");
+            takeShelterString.append("2. 집 밖에 있을 경우\n");
+            takeShelterString.append("  - 낙하물 주의 및 머리 보호\n\n");
+            takeShelterString.append("3. 상가에 있을 경우\n");
+            takeShelterString.append("  - 침착하게 행동\n\n");
+            takeShelterString.append("4. 엘리베이터를 타고 있을 경우\n");
+            takeShelterString.append("  - 가장 가까운 층에 내려 대피\n\n");
+            takeShelterString.append("5. 전철을 타고 있는 경우\n");
+            takeShelterString.append("  - 고정물을 꽉 잡자\n\n");
+            takeShelterString.append("6. 운전을 하고 있는 경우\n");
+            takeShelterString.append("  - 도로 우측에 정차한 후 대피\n\n");
+            takeShelterString.append("7. 산이나 바다에 있을 경우\n");
+            takeShelterString.append("  - 산사태 등 위험 지역 신속 대피\n\n");
+            takeShelterString.append("8. 부상자가 있는 경우\n");
+            takeShelterString.append("  - 서로 협력해서 응급 구호\n\n");
+            takeShelterString.append("9. 피난은 마지막 수단\n");
+            takeShelterString.append("  - 짐은 최소한으로 하고 대피는 걸어서\n\n");
+            takeShelterString.append("10. 올바른 정보에 따라 행동\n");
+            takeShelterString.append("  - 유언비어를 믿지 말자\n");
+
+            message.setText(String.valueOf(takeShelterString));
             MessageButton messageButton = new MessageButton("이미지 보기", "http://www.kfpp.or.kr/Upload/BoardImages/%EC%A7%80%EC%A7%84%20%EB%8C%80%ED%94%BC%EC%9A%94%EB%A0%B9.jpg");
             message.setMessage_button(messageButton);
             responseMessage.setKeyboard(keyboard);
             responseMessage.setMessage(message);
         }
-
         return responseMessage;
     }
 

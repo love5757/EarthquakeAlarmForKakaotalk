@@ -9,18 +9,18 @@
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<encoder>
-			<pattern>[%d{yyyy-MM-dd HH:mm:ss SSS}] [%thread] %-5p: %c - %m%n</pattern>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss SSS, Asia/Seoul}] [%thread] %-5p: %c - %m%n</pattern>
 		</encoder>
 	</appender>
 
 	<appender name="dailyRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<prudent>true</prudent>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_DIR}/foodTruck-%d{yyyyMMdd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_DIR}/earthquake-%d{yyyyMMdd, Asia/Seoul}.log</fileNamePattern>
 			<maxHistory>720</maxHistory>
 		</rollingPolicy>
 		<encoder>
-			<pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5p: %c - %m%n</pattern>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss, Asia/Seoul}] [%thread] %-5p: %c - %m%n</pattern>
 		</encoder>
 	</appender>
 

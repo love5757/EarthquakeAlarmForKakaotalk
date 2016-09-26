@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by philip on 2016-09-22.
@@ -24,8 +26,8 @@ public class EarthquakServiceImpl implements EarthquakeService{
 
     private static final Logger logger = LoggerFactory.getLogger(EarthquakServiceImpl.class);
 
-    public  Earthquake getInfoEarthquake()  {
-        Earthquake earthquake = new Earthquake();
+    public List<Earthquake> getInfoEarthquake()  {
+        List<Earthquake> earthquakeListResult = new ArrayList<>();
 
         Document doc = null;
         try {
@@ -33,39 +35,40 @@ public class EarthquakServiceImpl implements EarthquakeService{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Elements lastEarthQuakeInfo = doc.select(Config.LASTEARTHQUAKE_ELEMENTS.getDesc());
-        Elements lastCount = doc.select(Config.LASTCOUNT_ELEMENTS.getDesc());
-        for(Element e: lastEarthQuakeInfo){
-         logger.debug("[{}]",e.text());
+
+        Elements earthQuakeInfo = doc.select(Config.LASTEARTHQUAKE_ELEMENTS.getDesc());
+
+        for(Element element: earthQuakeInfo){
+            Earthquake earthquake = new Earthquake();
+            String[] values = element.text().split(" ");
+            Date to = null;
+            String from = values[1]+" "+values[2];
+            SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                to = transFormat.parse(from);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            // 최근에 일어난 지진정보 earthquake 객체에 넣기
+            earthquake.setNum(Integer.parseInt(values[0]));
+            earthquake.setEarthQuakeTime(to);
+            earthquake.setEarthQuakeSacle(Double.parseDouble(values[3]));
+            earthquake.setLatitude(Double.parseDouble(values[4]));
+            earthquake.setLongitude(Double.parseDouble(values[5]));
+            earthquake.setEarthQuakeArea(values[6]+" "+values[7]+" "+values[8]+" "+values[9]+" "+ values[10]);
+
+            earthquakeListResult.add(earthquake);
+
+            //최근 지진 5개 정보
+            if(earthquakeListResult.size() == 5) break;
+
         }
-        // 가장 최근 번호 저장
-        earthquake.setLastCount( Integer.parseInt(lastCount.text()));
 
-        String str = lastEarthQuakeInfo.first().text();
-        System.out.println(str);
-        String[] values = str.split(" ");
 
-        Date to = null;
+        logger.debug("[earthquake][{}]", earthquakeListResult);
 
-        String from = values[1]+" "+values[2];
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            to = transFormat.parse(from);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        // 최근에 일어난 지진정보 earthquake 객체에 넣기
-        earthquake.setNum(Integer.parseInt(values[0]));
-        earthquake.setEarthQuakeTime(to);
-        earthquake.setEarthQuakeSacle(Double.parseDouble(values[3]));
-        earthquake.setLatitude(Double.parseDouble(values[4]));
-        earthquake.setLongitude(Double.parseDouble(values[5]));
-        earthquake.setEarthQuakeArea(values[6]+" "+values[7]+" "+values[8]+" "+values[9]+" "+ values[10]);
-
-        logger.debug("[earthquake][{}]", earthquake);
-
-        return earthquake;
+        return earthquakeListResult;
     }
 
 }
