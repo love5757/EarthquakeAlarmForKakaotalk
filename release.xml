@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+	<id>${release.name}</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<files>
+		<file>
+			<source>target/${project.artifactId}-${project.version}.jar</source>
+			<outputDirectory>${project.artifactId}/lib</outputDirectory>
+		</file>
+	</files>
+
+	<fileSets>
+		<fileSet>
+			<directory>bin</directory>
+			<directoryMode>0755</directoryMode>
+			<fileMode>0755</fileMode>
+			<includes>
+				<include>*.sh</include>
+			</includes>
+			<outputDirectory>${project.artifactId}/bin</outputDirectory>
+		</fileSet>	
+		
+ 		<!-- dependency LIB를 별도 경로에 개별 jar로 생성 -->
+  		
+<!--		<fileSet>
+			<directory>target/lib</directory>
+			<includes>
+				<include>**</include>
+			</includes>
+			<outputDirectory>${project.artifactId}/lib</outputDirectory>
+		</fileSet>-->
+
+ 
+		<!-- 외부 설정 파일을 사용하는 경우 사용 -->
+<!--		<fileSet>
+			<directory>${resource.path}</directory>
+			<includes>
+				<include>**</include>
+			</includes>
+			<outputDirectory>${project.artifactId}/conf</outputDirectory>
+		</fileSet>-->
+
+<!-- 
+		<fileSet>
+			<directory>logs</directory>
+			<directoryMode>0755</directoryMode>
+			<fileMode>0755</fileMode>			
+			<excludes>
+				<exclude>*</exclude>
+			</excludes>
+			<outputDirectory>${project.artifactId}/logs</outputDirectory>
+		</fileSet>
+
+ -->	
+ 	</fileSets>
+</assembly>
