@@ -1,12 +1,15 @@
 package com.yerina.earthquake.controller;
 
 import com.yerina.earthquake.domain.*;
+import com.yerina.earthquake.domain.request.RegionReq;
 import com.yerina.earthquake.service.inf.EarthquakeService;
+import com.yerina.earthquake.service.inf.SearchShelterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,13 +25,15 @@ public class EarthquakeController {
 
     @Autowired
     private EarthquakeService earthquakeService;
+    @Autowired
+    private SearchShelterService searchShelterService;
 
     @RequestMapping(value = "/keyboard", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public Keyboard homeKeyboardAPI() {
 
         Keyboard keyboardResponse = new Keyboard();
         keyboardResponse.setType("buttons");
-        keyboardResponse.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령","3. 대피소 찾기"));
+        keyboardResponse.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령","3. 대피소 찾기","* 대피소 찾기"));
         logger.debug("[keyboardResponse][{}]",keyboardResponse);
 
         return keyboardResponse;
@@ -36,7 +41,7 @@ public class EarthquakeController {
 
     @RequestMapping(value = "/message", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     public Object receiveAndAutoReplyAPI(@RequestBody RequestMessage requestMessage) {
-        logger.debug("[request message][{}]", requestMessage);
+        logger.info("[request message][{}]", requestMessage);
 
         ResponseMessage responseMessage = new ResponseMessage();
         Message message = new Message();
@@ -44,9 +49,13 @@ public class EarthquakeController {
 
         Keyboard keyboard = new Keyboard();
         keyboard.setType("buttons");
-        keyboard.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령", "3. 대피소 찾기"));
+        keyboard.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령", "3. 대피소 찾기", "* 대피소 찾기(테스트중)"));
 
-        if(requestMessage.getContent().startsWith("1")){
+        if(requestMessage.getContent().contains("Cancel")){
+            message.setText("모든 작업이 취소 되었습니다.");
+            responseMessage.setKeyboard(keyboard);
+            responseMessage.setMessage(message);
+        }else if(requestMessage.getContent().startsWith("1")){
             final List<Earthquake> infoEarthquake1 = earthquakeService.getInfoEarthquake();
 
             StringBuffer earthquakeInfo = new StringBuffer();
@@ -106,6 +115,37 @@ public class EarthquakeController {
             responseMessage.setKeyboard(keyboard);
             responseMessage.setMessage(message);
 
+        }else if(requestMessage.getContent().startsWith("*")){
+            //TODO 진행중
+            RegionReq regionReq = new RegionReq();
+            StringBuffer regionHelpText = new StringBuffer();
+            final String[] orgCd = requestMessage.getContent().split("-");
+
+            if(orgCd.length != 1){
+                regionHelpText.append("선택 주소 : ");
+                regionHelpText.append(orgCd[0].split(" ")[1]);
+                regionReq.setOrgCd(orgCd[1]);
+            }else{
+                regionHelpText.append("주소를 선택해주세요.");
+            }
+            message.setText(String.valueOf(regionHelpText));
+
+
+            final List<Region> regdList = searchShelterService.searchRegion(regionReq).getList();
+            logger.debug("[{regdList}][{}]", regdList);
+
+            List<String> regionList = new ArrayList<>();
+            regionList.add("Cancel(취소)");
+
+            for (Region region : regdList) {
+                regionList.add("* "+region.getFllOrgNm()+"-"+region.getOrgCd());
+            }
+            Keyboard regionKeyboard = new Keyboard();
+            regionKeyboard.setType("buttons");
+            regionKeyboard.setButtons(regionList);
+            responseMessage.setKeyboard(regionKeyboard);
+
+            responseMessage.setMessage(message);
         }
 
 
