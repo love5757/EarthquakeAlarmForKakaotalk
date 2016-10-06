@@ -123,7 +123,8 @@ public class EarthquakeController {
 
             if(orgCd.length != 1){
                 regionHelpText.append("선택 주소 : ");
-                regionHelpText.append(orgCd[0].split(" ")[1]);
+                final String[] split = orgCd[0].split(" ");
+                Arrays.stream(split).filter(splitString -> !"*".equals(splitString)).forEach(splitString -> regionHelpText.append(" "+splitString));
                 regionReq.setOrgCd(orgCd[1]);
             }else{
                 regionHelpText.append("주소를 선택해주세요.");
