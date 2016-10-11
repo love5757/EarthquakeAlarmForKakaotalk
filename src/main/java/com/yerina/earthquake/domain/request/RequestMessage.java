@@ -1,4 +1,4 @@
-package com.yerina.earthquake.domain;
+package com.yerina.earthquake.domain.request;
 
 import lombok.Data;
 
