@@ -1,5 +1,6 @@
-package com.yerina.earthquake.domain;
+package com.yerina.earthquake.domain.result;
 
+import com.yerina.earthquake.domain.earthquake.Region;
 import lombok.Data;
 import lombok.ToString;
 

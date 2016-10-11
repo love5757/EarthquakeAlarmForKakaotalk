@@ -19,11 +19,6 @@
 	</appender>
 
 	<appender name="dailyRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>${LOG_LEVEL}</level>
-			<onMatch>ACCEPT</onMatch>
-			<onMismatch>DENY</onMismatch>
-		</filter>
 		<prudent>true</prudent>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${LOG_DIR}/earthquake-%d{yyyyMMdd, Asia/Seoul}.log</fileNamePattern>
@@ -43,10 +38,13 @@
 		<appender-ref ref="dailyRolling" />
 	</appender>
 
-	<logger name="com.yerina" level="${LOG_LEVEL}">
-		<appender-ref ref="async" />
+	<logger name="com.yerina.earthquake" level="${LOG_LEVEL}">
+		<appender-ref ref="dailyRolling" />
 	</logger>
 
-	<logger name="org.springframework.web" level="DEBUG"/>
+	<logger name="org.springframework.web" level="${LOG_LEVEL}"/>
+
+	<root level="${LOG_LEVEL}"/>
+
 
 </configuration>

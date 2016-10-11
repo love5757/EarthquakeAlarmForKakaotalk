@@ -1,5 +1,7 @@
-package com.yerina.earthquake.domain;
+package com.yerina.earthquake.domain.response;
 
+import com.yerina.earthquake.domain.message.Keyboard;
+import com.yerina.earthquake.domain.message.Message;
 import lombok.Data;
 
 /**

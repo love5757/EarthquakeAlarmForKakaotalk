@@ -1,6 +1,6 @@
 package com.yerina.earthquake.service.inf;
 
-import com.yerina.earthquake.domain.Earthquake;
+import com.yerina.earthquake.domain.earthquake.Earthquake;
 
 import java.util.List;
 

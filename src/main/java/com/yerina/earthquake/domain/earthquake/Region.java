@@ -1,4 +1,4 @@
-package com.yerina.earthquake.domain;
+package com.yerina.earthquake.domain.earthquake;
 
 import lombok.Data;
 import lombok.ToString;

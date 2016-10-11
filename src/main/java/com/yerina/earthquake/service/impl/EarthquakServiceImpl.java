@@ -1,7 +1,7 @@
 package com.yerina.earthquake.service.impl;
 
-import com.yerina.earthquake.constant.Config;
-import com.yerina.earthquake.domain.Earthquake;
+import com.yerina.earthquake.constant.ConstantConfig;
+import com.yerina.earthquake.domain.earthquake.Earthquake;
 import com.yerina.earthquake.service.inf.EarthquakeService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,12 +31,12 @@ public class EarthquakServiceImpl implements EarthquakeService{
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(Config.URL.getDesc()).get();
+            doc = Jsoup.connect(ConstantConfig.URL.getDesc()).get();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Elements earthQuakeInfo = doc.select(Config.LASTEARTHQUAKE_ELEMENTS.getDesc());
+        Elements earthQuakeInfo = doc.select(ConstantConfig.LASTEARTHQUAKE_ELEMENTS.getDesc());
 
         for(Element element: earthQuakeInfo){
             Earthquake earthquake = new Earthquake();

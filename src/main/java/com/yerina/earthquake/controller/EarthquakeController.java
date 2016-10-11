@@ -1,7 +1,15 @@
 package com.yerina.earthquake.controller;
 
-import com.yerina.earthquake.domain.*;
-import com.yerina.earthquake.domain.request.RegionReq;
+import com.yerina.earthquake.constant.Constant;
+import com.yerina.earthquake.domain.earthquake.Earthquake;
+import com.yerina.earthquake.domain.earthquake.Region;
+import com.yerina.earthquake.domain.earthquake.Shelter;
+import com.yerina.earthquake.domain.message.Keyboard;
+import com.yerina.earthquake.domain.message.Message;
+import com.yerina.earthquake.domain.message.MessageButton;
+import com.yerina.earthquake.domain.message.Photo;
+import com.yerina.earthquake.domain.request.RequestMessage;
+import com.yerina.earthquake.domain.response.ResponseMessage;
 import com.yerina.earthquake.service.inf.EarthquakeService;
 import com.yerina.earthquake.service.inf.SearchShelterService;
 import org.slf4j.Logger;
@@ -9,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by philip on 2016-09-22.
@@ -28,12 +36,15 @@ public class EarthquakeController {
     @Autowired
     private SearchShelterService searchShelterService;
 
+    public static ConcurrentHashMap<String, List<Region>> regionState = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, List<Shelter>> shelterState = new ConcurrentHashMap<>();
+
     @RequestMapping(value = "/keyboard", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
     public Keyboard homeKeyboardAPI() {
 
         Keyboard keyboardResponse = new Keyboard();
         keyboardResponse.setType("buttons");
-        keyboardResponse.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령","3. 대피소 찾기","* 대피소 찾기"));
+        keyboardResponse.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령","3. 대피소 찾기"));
         logger.debug("[keyboardResponse][{}]",keyboardResponse);
 
         return keyboardResponse;
@@ -49,12 +60,18 @@ public class EarthquakeController {
 
         Keyboard keyboard = new Keyboard();
         keyboard.setType("buttons");
-        keyboard.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령", "3. 대피소 찾기", "* 대피소 찾기(테스트중)"));
+        keyboard.setButtons(Constant.DEFAULT_BUTTONS);
 
         if(requestMessage.getContent().contains("Cancel")){
             message.setText("모든 작업이 취소 되었습니다.");
             responseMessage.setKeyboard(keyboard);
             responseMessage.setMessage(message);
+
+            //저장된 사용자 데이터 제거
+            regionState.remove(requestMessage.getUser_key());
+            //저장된 사용자 대피소 제거
+            shelterState.remove(requestMessage.getUser_key());
+
         }else if(requestMessage.getContent().startsWith("1")){
             final List<Earthquake> infoEarthquake1 = earthquakeService.getInfoEarthquake();
 
@@ -106,49 +123,14 @@ public class EarthquakeController {
             message.setMessage_button(messageButton);
             responseMessage.setKeyboard(keyboard);
             responseMessage.setMessage(message);
+
         }else if(requestMessage.getContent().startsWith("3")){
-            StringBuffer nearShelterSearch = new StringBuffer();
-            nearShelterSearch.append("아래 링크로 들어가 본인 주변의 대피소 확인\n\n");
-            message.setText(String.valueOf(nearShelterSearch));
-            MessageButton messageButton = new MessageButton("대피소 찾기", "http://safekorea.go.kr/idsiSFK/57/menuMap.do?w2xPath=/idsiSFK/wq/sfk/cs/contents/civil_defense/SDIJKM1402.xml");
-            message.setMessage_button(messageButton);
-            responseMessage.setKeyboard(keyboard);
-            responseMessage.setMessage(message);
-
-        }else if(requestMessage.getContent().startsWith("*")){
-            //TODO 진행중
-            RegionReq regionReq = new RegionReq();
-            StringBuffer regionHelpText = new StringBuffer();
-            final String[] orgCd = requestMessage.getContent().split("-");
-
-            if(orgCd.length != 1){
-                regionHelpText.append("선택 주소 : ");
-                final String[] split = orgCd[0].split(" ");
-                Arrays.stream(split).filter(splitString -> !"*".equals(splitString)).forEach(splitString -> regionHelpText.append(" "+splitString));
-                regionReq.setOrgCd(orgCd[1]);
-            }else{
-                regionHelpText.append("주소를 선택해주세요.");
-            }
-            message.setText(String.valueOf(regionHelpText));
-
-
-            final List<Region> regdList = searchShelterService.searchRegion(regionReq).getList();
-            logger.debug("[{regdList}][{}]", regdList);
-
-            List<String> regionList = new ArrayList<>();
-            regionList.add("Cancel(취소)");
-
-            for (Region region : regdList) {
-                regionList.add("* "+region.getFllOrgNm()+"-"+region.getOrgCd());
-            }
-            Keyboard regionKeyboard = new Keyboard();
-            regionKeyboard.setType("buttons");
-            regionKeyboard.setButtons(regionList);
-            responseMessage.setKeyboard(regionKeyboard);
-
-            responseMessage.setMessage(message);
+            responseMessage = searchShelterService.showRegionList(requestMessage);
+        }else if(requestMessage.getContent().startsWith(" ")){
+            responseMessage = searchShelterService.findNearShelter(requestMessage);
+        }else if(requestMessage.getContent().startsWith("시설")){
+            responseMessage = searchShelterService.selectShelterInfomation(requestMessage);
         }
-
 
         return responseMessage;
     }
@@ -160,12 +142,16 @@ public class EarthquakeController {
 
     @RequestMapping(value = "/friend/{user_key}", method = {RequestMethod.DELETE}, produces = "application/json; charset=utf-8")
     public void friendBlock(@PathVariable("user_key") String  userKey) {
-        logger.debug("[친구 삭제/차단][{}]",userKey);
+        logger.info("[친구 삭제/차단][{}]",userKey);
+        regionState.remove(userKey);
+        shelterState.remove(userKey);
     }
 
     @RequestMapping(value = "/chat_room/{user_key}", method = RequestMethod.DELETE, produces = "application/json; charset=utf-8")
     public void chatRoomLeave(@PathVariable("user_key") String  userKey) {
-        logger.debug("[채팅방 나가기][{}]",userKey);
+        logger.info("[채팅방 나가기][{}]",userKey);
+        regionState.remove(userKey);
+        shelterState.remove(userKey);
     }
 
 }
