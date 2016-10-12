@@ -8,6 +8,12 @@ import java.util.List;
  */
 public class Constant {
     public final static List DEFAULT_BUTTONS = Arrays.asList("1. 최근 지진 정보", "2. 대피요령", "3. 대피소 찾기");
+    public final static String KMA_NECIS_URL = "http://necis.kma.go.kr/necis-dbf/usermain/new/common/userMainNewForm.do";
+    public final static String LASTEARTHQUAKE_ELEMENTS ="div.yearly_earthquake tbody tr";
+
+    public final static String REGSION_POST_URL = "http://www.safekorea.go.kr/idsiSFK/sfk/ca/cac/are2/area2List.do";
+    public final static String SHELTER_POST_URL = "http://www.safekorea.go.kr/idsiSFK/sfk/cs/cvi/egf/selectMsfrtnTrlSport.do";
+
 
     public final static String LEVEL1 = "극소수의 사람을 제외하고는 전혀 느낄 수 없는 수준";
     public final static String LEVEL2 = "소수의 사람들, 특히 건물의 윗 층에 있는 소수의 사람들만 느낄 수 있는 수준으로 섬세하게 매달린 물체 진동";
