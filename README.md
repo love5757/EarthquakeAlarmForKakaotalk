@@ -22,10 +22,6 @@
 		<remote.port>{port}</remote.port>
 ```
 
-# Maven
-- scp 원 서 jar 파 업 코 들 있ㅓ 업 하 서 없
-
-
 
 #참고
 - https://github.com/plusfriend/auto_reply
