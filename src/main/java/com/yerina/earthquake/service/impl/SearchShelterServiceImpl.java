@@ -1,7 +1,7 @@
 package com.yerina.earthquake.service.impl;
 
 import com.google.gson.Gson;
-import com.yerina.earthquake.constant.ConstantConfig;
+import com.yerina.earthquake.constant.Constant;
 import com.yerina.earthquake.domain.earthquake.Region;
 import com.yerina.earthquake.domain.earthquake.Shelter;
 import com.yerina.earthquake.domain.message.Keyboard;
@@ -60,7 +60,7 @@ public class SearchShelterServiceImpl implements SearchShelterService{
     @Override
     public ResponseMessage showRegionList(RequestMessage requestMessage) {
         //대피소 검색 시작시 시도 구분값을 항시 업데이트
-        fristRegdList = collectInformaionOfSafeKorea(ConstantConfig.REGSION_POST_URL.getDesc(), new RegionReq(), new RegionResult()).getList();
+        fristRegdList = collectInformaionOfSafeKorea(Constant.REGSION_POST_URL, new RegionReq(), new RegionResult()).getList();
 
         StringBuffer regionHelpText = new StringBuffer();
         regionHelpText.append("시도, 시군구, 읍면동을\n 차례로 선택하세요.\n");
@@ -112,7 +112,7 @@ public class SearchShelterServiceImpl implements SearchShelterService{
 
             //선택된 시도의 orgCd로 시군구 리스트 조회
             regionReq.setOrgCd(foundSelectRegion.getOrgCd());
-            final List<Region> searchSelectRegionList = collectInformaionOfSafeKorea(ConstantConfig.REGSION_POST_URL.getDesc(), regionReq, new RegionResult()).getList();
+            final List<Region> searchSelectRegionList = collectInformaionOfSafeKorea(Constant.REGSION_POST_URL, regionReq, new RegionResult()).getList();
 
             //조회된 시군구 리스트 nextRegionList add
             searchSelectRegionList.forEach(region -> nextRegionList.add(" "+region.getFllOrgNm()));
@@ -128,7 +128,7 @@ public class SearchShelterServiceImpl implements SearchShelterService{
             //선택된 시도의 orgCd로 시군구 조회
             final String secondRegionOrgCd = userRegionList.stream().reduce((frist, second) -> second).get().getOrgCd();
             regionReq.setOrgCd(secondRegionOrgCd);
-            final List<Region> secondSearchSelectRegionList = collectInformaionOfSafeKorea(ConstantConfig.REGSION_POST_URL.getDesc(), regionReq, new RegionResult()).getList();
+            final List<Region> secondSearchSelectRegionList = collectInformaionOfSafeKorea(Constant.REGSION_POST_URL, regionReq, new RegionResult()).getList();
 
             //선택된 시군구의 Region
             foundSelectRegion = secondSearchSelectRegionList
@@ -141,7 +141,7 @@ public class SearchShelterServiceImpl implements SearchShelterService{
 
             //선택된 시군구의 읍면동 조회
             regionReq.setOrgCd(foundSelectRegion.getOrgCd());
-            final List<Region> thirdSearchSelectRegionList = collectInformaionOfSafeKorea(ConstantConfig.REGSION_POST_URL.getDesc(), regionReq, new RegionResult()).getList();
+            final List<Region> thirdSearchSelectRegionList = collectInformaionOfSafeKorea(Constant.REGSION_POST_URL, regionReq, new RegionResult()).getList();
 
             //조회된 읍면동 리스트 nextRegionList add
             thirdSearchSelectRegionList.forEach(region -> nextRegionList.add(" "+region.getFllOrgNm()));
@@ -156,7 +156,7 @@ public class SearchShelterServiceImpl implements SearchShelterService{
             //선택된 시군구의 orgCd로 읍면동 리스트조회
             final String thirdRegionOrgCd = userRegionList.stream().reduce((frist, second) -> second).get().getOrgCd();
             regionReq.setOrgCd(thirdRegionOrgCd);
-            final List<Region> thirdSearchSelectRegionList = collectInformaionOfSafeKorea(ConstantConfig.REGSION_POST_URL.getDesc(), regionReq, new RegionResult()).getList();
+            final List<Region> thirdSearchSelectRegionList = collectInformaionOfSafeKorea(Constant.REGSION_POST_URL, regionReq, new RegionResult()).getList();
 
             //선택된 읍면동 Region
             foundSelectRegion = thirdSearchSelectRegionList
@@ -173,13 +173,13 @@ public class SearchShelterServiceImpl implements SearchShelterService{
             shelterReq.setQ_area_cd_1(userRegionList.get(0).getOrgCd());
             shelterReq.setQ_area_cd_2(userRegionList.get(1).getOrgCd());
             shelterReq.setQ_area_cd_3(userRegionList.get(2).getOrgCd());
-            final int pageSize = collectInformaionOfSafeKorea(ConstantConfig.SHELTER_POST_URL.getDesc(),shelterReq,new ShelterResult()).getPageSize();
+            final int pageSize = collectInformaionOfSafeKorea(Constant.SHELTER_POST_URL,shelterReq,new ShelterResult()).getPageSize();
 
             List<Shelter> totalShelterResult = new ArrayList<>();
 
             for (int i= 1; i <= pageSize;i++){
                 shelterReq.setPageIndex(i);
-                collectInformaionOfSafeKorea(ConstantConfig.SHELTER_POST_URL.getDesc(),shelterReq,new ShelterResult()).getList().forEach(shelter -> totalShelterResult.add(shelter));
+                collectInformaionOfSafeKorea(Constant.SHELTER_POST_URL,shelterReq,new ShelterResult()).getList().forEach(shelter -> totalShelterResult.add(shelter));
             }
 
             totalShelterResult.forEach(shelter -> nextRegionList.add("시설:"+shelter.getFACIL_NM()+" / 규모:"+shelter.getFACIL_POW()+shelter.getFACIL_UNIT()));

@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,7 +43,7 @@ public class EarthquakeController {
 
         Keyboard keyboardResponse = new Keyboard();
         keyboardResponse.setType("buttons");
-        keyboardResponse.setButtons(Arrays.asList("1. 최근 지진 정보", "2. 대피요령","3. 대피소 찾기"));
+        keyboardResponse.setButtons(Constant.DEFAULT_BUTTONS);
         logger.debug("[keyboardResponse][{}]",keyboardResponse);
 
         return keyboardResponse;
@@ -87,7 +86,7 @@ public class EarthquakeController {
             
             message.setText(String.valueOf(earthquakeInfo));
 
-            MessageButton messageButton = new MessageButton("국가지진종합정보센터", "http://necis.kma.go.kr/necis-dbf/usermain/new/common/userMainNewForm.do");
+            MessageButton messageButton = new MessageButton("국가지진종합정보센터", Constant.KMA_NECIS_URL);
             message.setMessage_button(messageButton);
             responseMessage.setKeyboard(keyboard);
             responseMessage.setMessage(message);
