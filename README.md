@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/love5757/EarthquakeAlarmForKakaotalk.svg?branch=master)](https://travis-ci.org/love5757/EarthquakeAlarmForKakaotalk)
+
 # EarthquakeAlarmForKakaotalk
 - Spring Boot 으로 간단하게 만든 REST 서버
 - 카카오톡 옐로우 아이디를 이용하여 지진 정보 제공
